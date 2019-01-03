@@ -208,13 +208,7 @@ exceed_map=reactive ({
 
 output$plot1 = renderPlotly({
   
-  N= subset_standardz() #%>% #select(ID,Date,Acute,Chronic,Value.y,Parm.Name,
-                       #Type,Adj_Hard,Longitude,Latitude,Basin,Huc8,No.Sample.Days,Exceedance,Survey.Prog.Code.ID,Stream.Name) %>% 
-  #filter(ID %in% input$sites)# & !str_detect(Parm.Name, "HARDNESS")) #& str_detect(Parm.Name, parmchoice()))
- 
-  
-  #pp=plot_ly(data=N,x = ~ID, y = ~Value.y, 
-                # color = ~Parm.Name,type="scatter",mode='lines+markers')
+  N= subset_standardz() 
 
   p <- ggplot(N,aes(x=Date,y=Value.y,fill=as.factor(Parm.Name),key=N$ID,text =paste("ID:",ID)
                     ,shape=as.factor(Exceedance)))+
@@ -226,16 +220,9 @@ output$plot1 = renderPlotly({
        theme_classic()+
     
       labs(x = "Date", y = "ug/L")+
-    
-    #scale_shape_discrete(name  ="",
-                         #breaks=c("Yes", "NA"),
-                         #labels=c("Exceedance", ""))+
-    
       scale_x_date(date_breaks = "1 year", date_labels ="%Y")+
-    
       theme(axis.text.x=element_text(angle=60, hjust=1))
-  
-   ggplotly(p) %>% layout(dragmode="select")
+       ggplotly(p) %>% layout(dragmode="select")
   
   })
 
@@ -297,27 +284,13 @@ output$numsamples<- renderDataTable({
 })
 
 
-
-
-
-
-#selectedData <- reactive({
-#  data <- brushedPoints(mtcars2, input$plot1_brush)
-#  if (nrow(data) == 0)
-#    data <- mtcars2
-#  data
-
-
-
 output$exceed<- renderDataTable({  
   
   exx=StandardZ() %>% filter( Exceedance=="Yes") %>% 
     group_by(ID) %>% arrange(Date) %>%
     summarise(dates  = paste(Date, collapse ="|"),Metal = paste(Parm.Name, collapse ="|"), No.times = length(Date),No.Params= length(unique(Parm.Name)))  %>%
     arrange(desc(dates), No.times)
-  
-  #exx=exx %>% filter(No.times >= input$exceedances[1] & No.times>= input$exceedances[2])
-  
+
   DT::datatable(
     exx,
     extensions = 'Buttons', options = list(
@@ -399,17 +372,7 @@ output$downloadData <- downloadHandler(
 ) 
   
 ######
-     #metalsfix() %>% select(HARDNESS,STA_ID,STA_LV1_CODE,matches(matchExpression2)) 
-     
-     
-     #head(df)
-     
-     #if(input$disp == "head") {
-     # return(head(df))
-     #}
-     #else {
-     #  return(df)
-     # }
+
    
 master.subset.data <- reactive({
   
@@ -457,10 +420,7 @@ observe({
   }else{
     leafletProxy("mymap", data = df2) %>% 
       setView(lng = -77.78747222, lat = 37.39122222, zoom = 8) %>% 
-      clearMarkers() %>% 
-      #addMarkers(data =df )
-      #addCircleMarkers(data= df,radius=8 , color="black",  fillColor="red", stroke = TRUE, fillOpacity = 0.8, group="samplesize")
-      
+      clearMarkers() %>%     
       addProviderTiles("Esri.WorldImagery", group="WorldImagery") %>%
       addTiles(options = providerTileOptions(noWrap = TRUE), group="OpenStreetMap") %>%
       
@@ -472,10 +432,6 @@ observe({
                        popup = popupTable(df3,row.numbers = TRUE),labelOptions = labelOptions(noHide = FALSE, offset=c(0,-2), textOnly = FALSE)) %>%
     addLayersControl(overlayGroups = c("Filtered Sites","Filtered Exceedances") , baseGroups = c("WorldImagery","OpenStreetMap"), options = layersControlOptions(collapsed = FALSE))
     
-    #addResetMapButton() %>%
-      #addSearchFeatures(
-       # targetGroups  = 'df2',
-        #options = searchFeaturesOptions(propertyName = "ID",zoom=10, openPopup=TRUE))
        }
  
    
