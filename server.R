@@ -76,20 +76,6 @@ summarise(No.Sample.Days=n_distinct(Date))
 })
   
 
-#outVar1 = reactive({
- # mydata = DF()
- # unique(mydata$Basin)
-#})
-
-
-#observe({
-  
- # updateSelectInput(session, "basin",
-   #                 choices = outVar1() )
-  #})
-
-
- 
 
 
 output$ui_basins<-renderUI({
